@@ -17,8 +17,8 @@ class InvoiceResource extends JsonResource
             'user' =>[
                 'firstName' => $this->user->firstName,
                 'lastName' => $this->user->lastName,   
-                'fullName' => $this->user->firstName.' '. $this->lastName,
-                'email' => $this->user->email,  
+                'fullName' => $this->user->firstName.' '.$this->user->lastName,
+                'email' => $this->user->email, 
             ],
             'type' => $this->types[$this->type],
             'value' => 'R$ '. number_format($this->value, 2, ',','.'),
