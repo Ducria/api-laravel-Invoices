@@ -10,24 +10,27 @@ use App\Http\Resources\V1\InvoiceResource;
 use Illuminate\Support\Facades\Validator as Validator;
 
 
+
 class InvoiceController extends Controller
 {
     use HttpResponses;
-    /**
-     * Display a listing of the resource.
-     */
+ 
+
+    public function __construct(){
+        $this->middleware(['auth:sanctum', 'ability:invoice-store, user-update'])->only(['store','update']);
+    }
+
     public function index(Request $request)
     {
-        // return InvoiceResource::collection(Invoice::with('user')->get());
         return (new Invoice())->filter($request);
     }
 
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
+
+        if(!auth()->user()->tokenCan('invoice-store')){
+            return $this->error('Unauthorized', 403);
+        }
         $validator = Validator::make($request->all(),[
             'user_id' => 'required',
             'type' => 'required',
@@ -50,20 +53,11 @@ class InvoiceController extends Controller
     
     }
         
-        
-
-    /**
-     * Display the specified resource.
-     */
     public function show(Invoice $invoice)
     {
         return new InvoiceResource($invoice);
     }
 
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
         $validator = Validator::make($request->all(),[
@@ -100,9 +94,6 @@ class InvoiceController extends Controller
         
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Invoice $invoice)
     {
         $deleted = $invoice->delete();
